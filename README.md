@@ -33,5 +33,5 @@ This is an adapter to attach an E3D Titan, Bondtech BMG or other compatible groo
 ) of the Titan. 
 * [Wades Geared Extruder](https://reprap.org/wiki/Wade%27s_Geared_Extruder)
 * [Bondtech BMG extruder](https://www.bondtech.se/product/bmg-extruder/)
-* The [E3D Titan](https://e3d-online.com/titan-extruder) Extruder
+* [E3D Titan](https://e3d-online.com/blogs/news/titan-the-lightweight-easy-to-use-extruder-from-e3d?srsltid=AfmBOor2PoitQvzNMYY9IH4YrRRBcgBBtIq3q67ImcPBufWstZBZhEr6) Discontinued but available as a clone
 * And the [Mendel90](https://github.com/nophead/Mendel90) [RepRap](http://reprap.org)
