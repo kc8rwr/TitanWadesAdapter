@@ -1,4 +1,4 @@
-# Titan Wades Adapter
+# BMG / Titan / Grove Mount to Wades Adapter
 
 This is an adapter to attach an E3D Titan, Bondtech BMG or other compatible groove mount extruder to a Mendel90 or other carriage expecting a Wades extruder. This may work with other extruders/carriages with similar mounting styles. Many parameters may be changed, perhaps making it work with less similar printers and/or extruders. If you are only looking for a ready to print solution without customizing anything STLs are available on [Thingiverse](https://www.thingiverse.com/thing:4340787). The Thingiverse page also includes an STL for a modified Mendel90 d-motor mount allowing the original DB15 connector to be used with the new extruder.
 
@@ -33,5 +33,5 @@ This is an adapter to attach an E3D Titan, Bondtech BMG or other compatible groo
 ) of the Titan. 
 * [Wades Geared Extruder](https://reprap.org/wiki/Wade%27s_Geared_Extruder)
 * [Bondtech BMG extruder](https://www.bondtech.se/product/bmg-extruder/)
-* The [E3D Titan](https://e3d-online.com/titan-extruder) Extruder
+* [E3D Titan](https://e3d-online.com/blogs/news/titan-the-lightweight-easy-to-use-extruder-from-e3d?srsltid=AfmBOor2PoitQvzNMYY9IH4YrRRBcgBBtIq3q67ImcPBufWstZBZhEr6) Discontinued but available as a clone
 * And the [Mendel90](https://github.com/nophead/Mendel90) [RepRap](http://reprap.org)
