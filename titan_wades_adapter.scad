@@ -73,12 +73,12 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-  */
+*/
 
 /* [Main] */
 
-//the diameter of filament to be used with this extruder
-filament_diameter = 1.75;
+//the diameter of filament or ptfe liner tube to be used with this extruder
+filament_diameter = 1.75;//[1.75, 2.85, 3, 4, 6.25]
 
 //total width (left/right) of the adapter
 width = 66;
@@ -124,7 +124,7 @@ washer_diameter = 9;
 /* [Extruder Mount] */
 
 //distance between the center of the filament hole and the wedge which keeps the extruder from spinning around it's mount. Change for mounting a different width of extruder.
-extruder_stop = 14;
+extruder_stop = 14;//[5:0.25:20]
 
 //distance between the top of the adapter base and the bottom of the groove in the extruder mount
 extruder_groove_raise = 4;
@@ -137,6 +137,9 @@ extruder_groove_height = 6;
 
 //the thickness of the extruder lip support. It should be just thick enough to print cleanly yet be easy to remove. A value of 0.6 worked well for me but this may vary.
 extruder_lip_support = 0.6;
+
+//print a skin this thick across the filament hole right at the top of the extruder mounting hole. For single-piece printing, this allows the printer to bridge across the hole rather than stopping in mid-air at the center. It may be easily drilled out for use.
+filament_hole_support_skin = 0.5;
 
 /* [Carriage Mount] */
 
@@ -189,33 +192,34 @@ cross_support_label_ooffset = 2;
                          
 
 module titan_wades_adapter(hotend_diameter = 16,
-			   hotend_lip_height = 4,
-			   hotend_groove_depth = 2,
-			   extruder_diameter = 16,
-			   extruder_lip_height = 3.5,
-			   extruder_lip_support = 0.6,
-			   extruder_groove_raise = 4,
-			   extruder_groove_depth = 2,
-			   extruder_groove_height = 6,
-			   hot_nut_diameter = 6.5,
-			   hot_nut_height = 2.4,
-			   hot_bolt_diameter = 3.2,
-			   washer_diameter = 9,
-			   countersink_left_mount = true,
-			   countersink_right_mount = false,
+									hotend_lip_height = 4,
+									hotend_groove_depth = 2,
+									extruder_diameter = 16,
+									extruder_lip_height = 3.5,
+									extruder_lip_support = 0.6,
+									filament_hole_support_skin = 0.4,
+									extruder_groove_raise = 4,
+									extruder_groove_depth = 2,
+									extruder_groove_height = 6,
+									hot_nut_diameter = 6.5,
+									hot_nut_height = 2.4,
+									hot_bolt_diameter = 3.2,
+									washer_diameter = 9,
+									countersink_left_mount = true,
+									countersink_right_mount = false,
                            mount_bolt_spacing = 50,
-			   mount_bolt_diameter = 4.5,
-			   mount_bolt_head_diameter = 7.5,
-			   mount_bolt_head_height = 2.4,
-			   mount_bolt_hex_head_height = 2.4,
-			   mount_bolt_hex_diameter = 8.5,
-			   mount_bolt_hex_left = true,
-			   mount_bolt_hex_right = false,
-			   filament_diameter = 3,
-			   width = 66,
-			   depth = 28,
-			   thickness = 9,
-			   side = "both",
+									mount_bolt_diameter = 4.5,
+									mount_bolt_head_diameter = 7.5,
+									mount_bolt_head_height = 2.4,
+									mount_bolt_hex_head_height = 2.4,
+									mount_bolt_hex_diameter = 8.5,
+									mount_bolt_hex_left = true,
+									mount_bolt_hex_right = false,
+									filament_diameter = 3,
+									width = 66,
+									depth = 28,
+									thickness = 9,
+									side = "both",
                            cross_support_length=10,
                            cross_support_width=20,
                            cross_support_label="3",
@@ -223,157 +227,161 @@ module titan_wades_adapter(hotend_diameter = 16,
                            cross_support_label_ooffset=2,
                            extruder_stop=14){
 
-  $fn = 360;
+	$fn = 360;
 
-  difference(){
-    union(){
-      linear_extrude(height = thickness){
-	//main left/right body
-	hull(){
-	  for (t=[[width/2 - 3.5, depth/2 - 3.5], [-width/2 + 3.5, depth/2 - 3.5], [-width/2 +3.5, -depth/2 + 3.5], [width/2 - 3.5, -depth/2 + 3.5]])
-	  {
-	    translate(t)
-	    {
-	      circle(d=7);
-	    }
-	  }
-	}
-	//optional front/back cross supports
-	if (cross_support_length > 0 && cross_support_width > 0){
-	  hull(){
-	    for (t=[[cross_support_width/2 - 3.5, cross_support_length + (depth/2) - 3.5], [-cross_support_width/2 + 3.5, cross_support_length + (depth/2) - 3.5], [-cross_support_width/2 +3.5, -cross_support_length - (depth/2) + 3.5], [cross_support_width/2 - 3.5, -cross_support_length - (depth/2) + 3.5]])
-	    {
-	      translate(t)
-	      {
-		circle(d=7);
-	      }
-	    }
-	  }
-	}
-      }
-      //optional extruder stop
-      if (0 < extruder_stop){
-	translate([extruder_stop, -0.33*depth, thickness+5]){
-	  rotate([-90, 0, 0]){
-	    linear_extrude(height=depth*0.66){
-	      polygon([[0, 0], [5, 5], [0, 5]]);
-	    }
-	  }
-	}
-      }  
-      translate([0, 0, thickness - 1]){
-	cylinder(d=extruder_diameter - (2 * extruder_groove_depth), h = extruder_groove_raise + extruder_groove_depth + extruder_groove_height + 1);
 	difference(){
-	  cylinder(d=extruder_diameter, h = extruder_groove_raise + extruder_lip_height + extruder_groove_height + 1);
-	  translate([0, 0, 1 + extruder_groove_raise]){
-	    cylinder(d = extruder_diameter + (extruder_lip_support==0 ? 1 : -1*extruder_lip_support*2), h = extruder_groove_height);
-	  }
-	}
-      }
-    }
-    translate([0, 0, -1]){
-      for (a=[20, 150, 270]){
-	rotate(a){
-	  translate([0, (hotend_diameter/2) + (washer_diameter/2) - hotend_groove_depth, 0]){
-	    cylinder(d=hot_bolt_diameter, h=thickness + 2);
-	    translate([0, 0, thickness + 1 - hot_nut_height]){
-	      cylinder(d=hot_nut_diameter, $fn = 6, h = hot_nut_height * 2);
-	    }
-	  }
-	}
-      }
-      cylinder(d = hotend_diameter, h=hotend_lip_height + 1); //hotend mount hole
-      cylinder(d = filament_diameter, h=thickness + extruder_groove_raise + extruder_groove_height + extruder_lip_height + 2); //filament hole
-      translate([mount_bolt_spacing/-2, 0, 0])
-      {
-	cylinder(d=mount_bolt_diameter, h=thickness + 2);
-	if (countersink_left_mount){
-	  translate([0, 0, thickness - (mount_bolt_hex_left ? mount_bolt_hex_head_height : mount_bolt_head_height)]){
-	    cylinder(d = mount_bolt_hex_left ? mount_bolt_hex_diameter : mount_bolt_head_diameter, h = 2 + (mount_bolt_hex_left ? mount_bolt_hex_head_height : mount_bolt_head_height), $fn = mount_bolt_hex_left ? 6 : $fn);
-	  }
-	}
-      }
-      translate([mount_bolt_spacing/2, 0, 0])
-      {
-	cylinder(d=mount_bolt_diameter, h=thickness + 2);
-	if (countersink_right_mount){
-	  translate([0, 0, thickness - (mount_bolt_hex_right ? mount_bolt_hex_head_height : mount_bolt_head_height)]){
-	    cylinder(d = mount_bolt_hex_right ? mount_bolt_hex_diameter : mount_bolt_head_diameter, h = 2 + (mount_bolt_hex_right ? mount_bolt_hex_head_height : mount_bolt_head_height), $fn = mount_bolt_hex_right ? 6 : $fn);
-	  }
-	}
-      }
-    }
-    if ("both" != side){
-      division = ((thickness - max(hot_nut_height, mount_bolt_head_height) - hotend_lip_height) / 2) + hotend_lip_height;
-      assert(division > 0, "Cannot split, no vertical space between topside nut traps and bottomside hotend opening");
-      if ("top" == side){
-	translate([-width/2 - 1, -depth/2 - cross_support_length - 1, -1]){
-	  cube([width+2, depth+(2*cross_support_length)+2, division]);
-	}
-      }
-      if ("bottom" == side){
-	translate([-width/2 - 1, -depth/2 -cross_support_length - 1, division]){
-	  cube([width+2, depth+(2*cross_support_length)+2, 100]);
-	}
-      }
-    }
-    //filament size label (only available if front/back cross supports exist)
-    if (cross_support_width > 0 && cross_support_length > 0){
-      for (i=[[0, thickness-2], [180, 2]]){
-	let (t=i.x, z=i.y){
-	  translate([0, 0, z]){
-	    for (angle=[0, 180]){
-	      rotate([0, t, angle]){
-		linear_extrude(height = 3){
-		  translate([(-cross_support_width/2) + cross_support_label_loffset, -(depth/2) - (cross_support_length) + cross_support_label_ooffset]){
-		    resize([0, 6.6], auto=true){
-		      text(text=cross_support_label);
-		    }
-		  }
+		union(){
+			linear_extrude(height = thickness){
+				//main left/right body
+				hull(){
+					for (t=[[width/2 - 3.5, depth/2 - 3.5], [-width/2 + 3.5, depth/2 - 3.5], [-width/2 +3.5, -depth/2 + 3.5], [width/2 - 3.5, -depth/2 + 3.5]])
+						{
+							translate(t)
+								{
+									circle(d=7);
+								}
+						}
+				}
+				//optional front/back cross supports
+				if (cross_support_length > 0 && cross_support_width > 0){
+					hull(){
+						for (t=[[cross_support_width/2 - 3.5, cross_support_length + (depth/2) - 3.5], [-cross_support_width/2 + 3.5, cross_support_length + (depth/2) - 3.5], [-cross_support_width/2 +3.5, -cross_support_length - (depth/2) + 3.5], [cross_support_width/2 - 3.5, -cross_support_length - (depth/2) + 3.5]])
+							{
+								translate(t)
+									{
+										circle(d=7);
+									}
+							}
+					}
+				}
+			}
+			//optional extruder stop
+			if (0 < extruder_stop){
+				translate([extruder_stop, -0.33*depth, thickness+5]){
+					rotate([-90, 0, 0]){
+						linear_extrude(height=depth*0.66){
+							polygon([[0, 0], [5, 5], [0, 5]]);
+						}
+					}
+				}
+			}  
+			translate([0, 0, thickness - 1]){
+				cylinder(d=extruder_diameter - (2 * extruder_groove_depth), h = extruder_groove_raise + extruder_groove_depth + extruder_groove_height + 1);
+				difference(){
+					cylinder(d=extruder_diameter, h = extruder_groove_raise + extruder_lip_height + extruder_groove_height + 1);
+					translate([0, 0, 1 + extruder_groove_raise]){
+						cylinder(d = extruder_diameter + (extruder_lip_support==0 ? 1 : -1*extruder_lip_support*2), h = extruder_groove_height);
+					}
+				}
+			}
 		}
-	      }
-	    }
-	  }
+		translate([0, 0, -1]){
+			for (a=[20, 150, 270]){
+				rotate(a){
+					translate([0, (hotend_diameter/2) + (washer_diameter/2) - hotend_groove_depth, 0]){
+						cylinder(d=hot_bolt_diameter, h=thickness + 2);
+						translate([0, 0, thickness + 1 - hot_nut_height]){
+							cylinder(d=hot_nut_diameter, $fn = 6, h = hot_nut_height * 2);
+						}
+					}
+				}
+			}
+			cylinder(d = hotend_diameter, h=hotend_lip_height + 1); //hotend mount hole
+			//filament hole
+			translate([0, 0, (0 < filament_hole_support_skin ? 1 + filament_hole_support_skin : 0) + hotend_lip_height]){
+				cylinder(d = filament_diameter, h=thickness + extruder_groove_raise + extruder_groove_height + 0 - (0 < filament_hole_support_skin ? filament_hole_support_skin : -1));
+			}
+			translate([mount_bolt_spacing/-2, 0, 0])
+				{
+					cylinder(d=mount_bolt_diameter, h=thickness + 2);
+					if (countersink_left_mount){
+						translate([0, 0, thickness - (mount_bolt_hex_left ? mount_bolt_hex_head_height : mount_bolt_head_height)]){
+							cylinder(d = mount_bolt_hex_left ? mount_bolt_hex_diameter : mount_bolt_head_diameter, h = 2 + (mount_bolt_hex_left ? mount_bolt_hex_head_height : mount_bolt_head_height), $fn = mount_bolt_hex_left ? 6 : $fn);
+						}
+					}
+				}
+			translate([mount_bolt_spacing/2, 0, 0])
+				{
+					cylinder(d=mount_bolt_diameter, h=thickness + 2);
+					if (countersink_right_mount){
+						translate([0, 0, thickness - (mount_bolt_hex_right ? mount_bolt_hex_head_height : mount_bolt_head_height)]){
+							cylinder(d = mount_bolt_hex_right ? mount_bolt_hex_diameter : mount_bolt_head_diameter, h = 2 + (mount_bolt_hex_right ? mount_bolt_hex_head_height : mount_bolt_head_height), $fn = mount_bolt_hex_right ? 6 : $fn);
+						}
+					}
+				}
+		}
+		if ("both" != side){
+			division = ((thickness - max(hot_nut_height, mount_bolt_head_height) - hotend_lip_height) / 2) + hotend_lip_height;
+			assert(division > 0, "Cannot split, no vertical space between topside nut traps and bottomside hotend opening");
+			if ("top" == side){
+				translate([-width/2 - 1, -depth/2 - cross_support_length - 1, -1]){
+					cube([width+2, depth+(2*cross_support_length)+2, division]);
+				}
+			}
+			if ("bottom" == side){
+				translate([-width/2 - 1, -depth/2 -cross_support_length - 1, division]){
+					cube([width+2, depth+(2*cross_support_length)+2, 100]);
+				}
+			}
+		}
+		//filament size label (only available if front/back cross supports exist)
+		if (cross_support_width > 0 && cross_support_length > 0){
+			for (i=[[0, thickness-2], [180, 2]]){
+				let (t=i.x, z=i.y){
+					translate([0, 0, z]){
+						for (angle=[0, 180]){
+							rotate([0, t, angle]){
+								linear_extrude(height = 3){
+									translate([(-cross_support_width/2) + cross_support_label_loffset, -(depth/2) - (cross_support_length) + cross_support_label_ooffset]){
+										resize([0, 6.6], auto=true){
+											text(text=cross_support_label);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
-      }
-    }
-  }
 }
 
 
 titan_wades_adapter(
-  filament_diameter = filament_diameter,
-  width = width,
-  depth =depth,
-  thickness = thickness,
-  side = side,
-  hotend_diameter = hotend_diameter,
-  hotend_lip_height = hotend_lip_height,
-  hotend_groove_depth = hotend_groove_depth,
-  extruder_diameter = extruder_diameter,
-  extruder_lip_height = extruder_lip_height,
-  hot_nut_diameter = hot_nut_diameter,
-  hot_nut_height = hot_nut_height,
-  hot_bolt_diameter = hot_bolt_diameter,
-  washer_diameter = washer_diameter,
-  extruder_stop = extruder_stop,
-  extruder_groove_raise = extruder_groove_raise,
-  extruder_groove_depth = extruder_groove_depth,
-  extruder_groove_height = extruder_groove_height,
-  extruder_lip_support = extruder_lip_support,
-  countersink_left_mount = countersink_left_mount,
-  mount_bolt_hex_left = mount_bolt_hex_left,
-  countersink_right_mount = countersink_right_mount,
-  mount_bolt_hex_right = mount_bolt_hex_right,
-  mount_bolt_spacing = mount_bolt_spacing,
-  mount_bolt_diameter = mount_bolt_diameter,
-  mount_bolt_head_diameter = mount_bolt_head_diameter,
-  mount_bolt_head_height = mount_bolt_head_height,
-  mount_bolt_hex_head_height = mount_bolt_hex_head_height,
-  mount_bolt_hex_diameter = mount_bolt_hex_diameter,
-  cross_support_length = cross_support_length,
-  cross_support_width = cross_support_width,
-  cross_support_label = cross_support_label,
-  cross_support_label_loffset = cross_support_label_loffset,
-  cross_support_label_ooffset = cross_support_label_ooffset
-  );
+	filament_diameter = filament_diameter,
+	width = width,
+	depth =depth,
+	thickness = thickness,
+	side = side,
+	hotend_diameter = hotend_diameter,
+	hotend_lip_height = hotend_lip_height,
+	hotend_groove_depth = hotend_groove_depth,
+	extruder_diameter = extruder_diameter,
+	extruder_lip_height = extruder_lip_height,
+	hot_nut_diameter = hot_nut_diameter,
+	hot_nut_height = hot_nut_height,
+	hot_bolt_diameter = hot_bolt_diameter,
+	washer_diameter = washer_diameter,
+	extruder_stop = extruder_stop,
+	extruder_groove_raise = extruder_groove_raise,
+	extruder_groove_depth = extruder_groove_depth,
+	extruder_groove_height = extruder_groove_height,
+	extruder_lip_support = extruder_lip_support,
+	filament_hole_support_skin = filament_hole_support_skin,
+	countersink_left_mount = countersink_left_mount,
+	mount_bolt_hex_left = mount_bolt_hex_left,
+	countersink_right_mount = countersink_right_mount,
+	mount_bolt_hex_right = mount_bolt_hex_right,
+	mount_bolt_spacing = mount_bolt_spacing,
+	mount_bolt_diameter = mount_bolt_diameter,
+	mount_bolt_head_diameter = mount_bolt_head_diameter,
+	mount_bolt_head_height = mount_bolt_head_height,
+	mount_bolt_hex_head_height = mount_bolt_hex_head_height,
+	mount_bolt_hex_diameter = mount_bolt_hex_diameter,
+	cross_support_length = cross_support_length,
+	cross_support_width = cross_support_width,
+	cross_support_label = cross_support_label,
+	cross_support_label_loffset = cross_support_label_loffset,
+	cross_support_label_ooffset = cross_support_label_ooffset
+);
